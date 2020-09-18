@@ -4,3 +4,6 @@ obj/
 .vs
 x64/
 *.o
+DiscordBot
+debug/
+*.gch
