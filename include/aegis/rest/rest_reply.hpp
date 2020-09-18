@@ -143,7 +143,7 @@ public:
     rest_reply & operator=(const rest_reply &) = default;
     rest_reply(const aegis::rest::rest_reply &) = default;
 
-    operator bool()
+    operator bool() const noexcept
     {
         if (reply_code == http_code::ok || reply_code == http_code::created || reply_code == http_code::accepted || reply_code == http_code::no_content)
             return true;
@@ -152,7 +152,7 @@ public:
 
     ~rest_reply() = default;
 
-    bool success()
+    bool success() const noexcept
     {
         if (reply_code >= http_code::ok && reply_code <= http_code::partial_content)
             return true;
