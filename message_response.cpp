@@ -191,8 +191,8 @@ namespace test_discord {
 		{
 			{"bot-spam"sv,
 				{
-					{"!hi"sv, {say_hi, "Says Hello"sv, "!Hi"sv}},
-					{"!hello"sv, {say_hi, "Says Hello"sv, "!Hello"sv}},
+					{"!hi"sv, {say_hi, "Says Hello"sv, "!hi"sv}},
+					{"!hello"sv, {say_hi, "Says Hello"sv, "!hello"sv}},
 					{"!help"sv, {give_help, "Gives the help menu"sv, "!help [command_name]"sv}}
 				}
 			},
