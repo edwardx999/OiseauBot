@@ -9,6 +9,7 @@ else
 	MAIN = DiscordBot_debug
 endif
 
+DEFINES = -DAEGIS_SEPARATE_COMPILATION
 CC = g++-8
 LINKER = -lstdc++ -lstdc++fs -lpthread -lz -lssl -lcrypto
 INCLUDE = -Iinclude
@@ -24,13 +25,13 @@ $(INTERMEDIATE):
 	mkdir $@
 
 $(INTERMEDIATE)/%.o: %.cpp $(PRECOMP_OUT) | $(INTERMEDIATE)
-	$(CC) $< -c $(FLAGS) $(INCLUDE) -include$(INTERMEDIATE)/$(PRECOMP) -o $@
+	$(CC) $< -c $(FLAGS) $(INCLUDE) -include$(INTERMEDIATE)/$(PRECOMP) $(DEFINES) -o $@
 
 $(PRECOMP_OUT): $(PRECOMP)
-	$(CC) $< $(FLAGS) $(INCLUDE) -o $@
+	$(CC) $< $(FLAGS) $(INCLUDE) $(DEFINES) -o $@
 
 semiclean:
-	(rm $(INTERMEDIATE)/* || true)
+	(rm $(INTERMEDIATE)/*.o || true)
 
 clean: semiclean
 	(rm $(PRECOMP_OUT) || true)

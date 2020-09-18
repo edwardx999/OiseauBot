@@ -24,12 +24,18 @@
     <ClCompile Include="ready_response.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="aegis_sep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="event_responses.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hangman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

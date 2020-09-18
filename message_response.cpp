@@ -50,9 +50,9 @@ namespace test_discord {
 	{
 		auto const string_end = full.data() + full.size();
 		auto const end = std::find_if(full.data(), string_end, [](char c)
-		{
-			return std::isspace(c);
-		});
+									  {
+										  return std::isspace(c);
+									  });
 		return { full.data(), std::size_t(end - full.data()) };
 	}
 
@@ -76,9 +76,9 @@ namespace test_discord {
 		auto& channel = message.msg.get_channel();
 		auto const suffix = after_token(message.msg.get_content(), token_length);
 		if (std::all_of(suffix.begin(), suffix.end(), [](char c)
-		{
-			return bool(std::isspace(c));
-		}))
+						{
+							return bool(std::isspace(c));
+						}))
 		{
 			static auto const help_message = []()
 			{
@@ -148,6 +148,15 @@ namespace test_discord {
 		message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, you must provide a role argument"), message.msg.author.id));
 	}
 
+	template<typename Map>
+	auto find_role(Map& map, std::string_view role_name)
+	{
+		return std::find_if(map.begin(), map.end(), [role_name](auto const& role)
+							{
+								return role.second.name == role_name;
+							});
+	}
+
 	void give_role(aegis::gateway::events::message_create message, std::size_t token_length)
 	{
 		auto& guild = message.msg.get_guild();
@@ -159,32 +168,40 @@ namespace test_discord {
 			no_role_argument_error_response(message);
 			return;
 		}
-		for (auto const& role : roles)
+		if (auto const role_it = find_role(roles, found_suffix); role_it != roles.end())
 		{
-			if (role.second.name == found_suffix)
+			auto const& role = *role_it;
+			if (guild.member_has_role(message.get_user().get_id(), role.first))
+			{
+				message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, you already have the role {}"), message.msg.author.id, role.second.name));
+			}
+			else
 			{
 				auto error_share = std::make_shared<std::exception_ptr>();
 				guild.add_guild_member_role(message.get_user().get_id(), role.second.id)
 					.handle_exception([error_share](std::exception_ptr error)
-					{
-						*error_share = error;
-						return aegis::gateway::objects::role{};
-					})
+									  {
+										  *error_share = error;
+										  return aegis::gateway::objects::role{};
+									  })
 					.then([message, role_name = role.second.name, error_share](aegis::gateway::objects::role const& role) mutable
-					{
-						if (auto error_ptr = *error_share)
-						{
-							message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, I cannot give you role {}"), message.msg.author.id, role_name));
-						}
-						else
-						{
-							message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, you have been given role {}"), message.msg.author.id, role_name));
-						}
-					});
-				return;
+									  {
+										  if (auto error_ptr = *error_share)
+										  {
+											  message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, I cannot give you role {}"), message.msg.author.id, role_name));
+										  }
+										  else
+										  {
+											  message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, you have been given role {}"), message.msg.author.id, role_name));
+										  }
+									  });
+									  return;
 			}
 		}
-		no_role_error_response(message, found_suffix);
+		else
+		{
+			no_role_error_response(message, found_suffix);
+		}
 	}
 
 	void take_role(aegis::gateway::events::message_create message, std::size_t token_length)
@@ -198,26 +215,33 @@ namespace test_discord {
 			no_role_argument_error_response(message);
 			return;
 		}
-		for (auto const& role : roles)
+		if (auto const role_it = find_role(roles, found_suffix); role_it != roles.end())
 		{
-			if (role.second.name == found_suffix)
+			auto const& role = *role_it;
+			if (!guild.member_has_role(message.get_user().get_id(), role.first))
+			{
+				message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, you do not have the role {}"), message.msg.author.id, role.second.name));
+			}
+			else
 			{
 				guild.remove_guild_member_role(message.get_user().get_id(), role.first)
 					.then([message, role_name = role.second.name](aegis::rest::rest_reply const& reply) mutable
+				{
+					if (!reply)
 					{
-						if (!reply)
-						{
-							message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, I cannot remove the role {}"), message.msg.author.id, role_name));
-						}
-						else
-						{
-							message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, you have lost the role {}"), message.msg.author.id, role_name));
-						}
-					});
-				return;
+						message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, I cannot remove the role {}"), message.msg.author.id, role_name));
+					}
+					else
+					{
+						message.msg.get_channel().create_message(fmt::format(FMT_STRING("<@{}>, you have lost the role {}"), message.msg.author.id, role_name));
+					}
+				});
 			}
 		}
-		no_role_error_response(message, found_suffix);
+		else
+		{
+			no_role_error_response(message, found_suffix);
+		}
 	}
 
 	channel_command_map const& get_command_map()
