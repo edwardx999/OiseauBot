@@ -168,6 +168,7 @@
   <ItemGroup>
     <ClCompile Include="DiscordBot.cpp" />
     <ClCompile Include="message_response.cpp" />
+    <ClCompile Include="ready_response.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="event_responses.h" />

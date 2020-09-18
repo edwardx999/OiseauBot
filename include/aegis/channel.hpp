@@ -278,11 +278,6 @@ public:
     }
 #endif
 
-    AEGIS_DECL core & get_bot() const noexcept
-    {
-        return *_bot;
-    }
-
     /// Send message to this channel
     /**
      * @param content A string of the message to send

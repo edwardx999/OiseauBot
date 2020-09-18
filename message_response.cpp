@@ -206,12 +206,12 @@ namespace test_discord {
 		return map;
 	}
 
-	void message_create_response(aegis::gateway::events::message_create message)
+	void message_create_response(aegis::core& bot, aegis::gateway::events::message_create message)
 	{
 		auto& channel = message.msg.get_channel();
 		{
 			auto const author_id = message.msg.get_author_id();
-			auto const self_id = channel.get_bot().get_id();
+			auto const self_id = bot.get_id();
 			if (author_id == self_id)
 			{
 				return;

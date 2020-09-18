@@ -21,6 +21,9 @@
     <ClCompile Include="message_response.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ready_response.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">

@@ -45,7 +45,15 @@ int main(int argc, char** argv)
 
 		auto const token = read_whole_file(argv[1]);
 		aegis::core bot(aegis::create_bot_t().log_level(spdlog::level::trace).token(token));
-		bot.set_on_message_create(test_discord::message_create_response);
+		auto const bind_to_bot = [&bot](auto func)
+		{
+			return [&bot, func = std::move(func)](auto&&... args)
+			{
+				func(bot, std::forward<decltype(args)>(args)...);
+			};
+		};
+		bot.set_on_message_create(bind_to_bot(test_discord::message_create_response));
+		bot.set_on_ready(bind_to_bot(test_discord::on_ready_response));
 		bot.run();
 		bot.yield();
 	}
